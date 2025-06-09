@@ -86,60 +86,6 @@ export default function Component() {
     setBsAmount(tempUsd);
   };
 
-  // Elimina el useEffect que hacía conversión automática:
-  // useEffect(() => {
-  //   if (bcvData && usdAmount !== "") {
-  //     const usd = Number.parseFloat(usdAmount) || 0
-  //     const convertedBs = (usd * bcvData.rate).toFixed(2)
-  //     setBsAmount(convertedBs)
-  //   } else if (usdAmount === "") {
-  //     setBsAmount("")
-  //   }
-  // }, [usdAmount, bcvData])
-
-  // Cambia el onChange del input USD a:
-  // onChange={(e) => handleUsdChange(e.target.value)}
-
-  // El input de BS ya usa handleBsChange correctamente
-
-  // useEffect(() => {
-  //   if (bcvData && usdAmount !== "") {
-  //     const usd = Number.parseFloat(usdAmount) || 0
-  //     const convertedBs = (usd * bcvData.rate).toFixed(2)
-  //     setBsAmount(convertedBs)
-  //   } else if (usdAmount === "") {
-  //     setBsAmount("")
-  //   }
-  // }, [usdAmount, bcvData])
-
-  // const handleBsChange = (value: string) => {
-  //   setBsAmount(value)
-  //   if (bcvData && value !== "") {
-  //     const bs = Number.parseFloat(value) || 0
-  //     const convertedUsd = (bs / bcvData.rate).toFixed(2)
-  //     setUsdAmount(convertedUsd)
-  //   } else if (value === "") {
-  //     setUsdAmount("")
-  //   }
-  // }
-
-  // const swapCurrencies = () => {
-  //   // En lugar de intercambiar valores directamente,
-  //   // intercambiamos qué moneda estamos editando
-  //   const currentUsd = Number.parseFloat(usdAmount) || 0
-  //   const currentBs = Number.parseFloat(bsAmount) || 0
-
-  //   // Si actualmente tenemos USD como base, convertimos a BS como base
-  //   if (currentUsd > 0) {
-  //     setUsdAmount(currentBs.toString())
-  //     setBsAmount(currentUsd.toString())
-  //   } else {
-  //     // Si tenemos BS como base, convertimos a USD como base
-  //     setUsdAmount(currentBs.toString())
-  //     setBsAmount(currentUsd.toString())
-  //   }
-  // }
-
   // Pantalla de carga
   if (loading) {
     return (
@@ -150,16 +96,10 @@ export default function Component() {
           transition={{ duration: 0.3 }}
           className="text-center"
         >
-          <motion.div
-            initial={{ rotate: 0 }}
-            animate={{ rotate: 360 }}
-            exit={{ rotate: 0 }}
-            transition={{ duration: 5, ease: "linear", repeat: Number.POSITIVE_INFINITY }}
-            className="w-16 h-16 border-4 border-red-500 border-t-transparent rounded-full mx-auto mb-4"
-          />
+          <div className="w-16 animate-spin h-16 border-4 border-red-500 border-t-transparent rounded-full mx-auto mb-4" />
           <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.1, duration: 0.3 }}>
             <DollarSign className="w-8 h-8 text-red-400 mx-auto mb-3" />
-            <p className="text-red-300 text-lg font-medium">Conectando con el BCV...</p>
+            <p className="text-red-300 text-lg font-medium">Cargando datos...</p>
             <p className="text-red-500 text-sm mt-1">Obteniendo tasa oficial</p>
           </motion.div>
         </motion.div>
@@ -212,8 +152,7 @@ export default function Component() {
                 transition={{ delay: 0.25, duration: 0.3 }}
                 className="text-red-300 mb-6 text-sm leading-relaxed"
               >
-                No pudimos obtener los datos del Banco Central de Venezuela. Esto puede deberse a problemas de
-                conectividad o mantenimiento del sitio web.
+                No pudimos obtener los datos. Esto puede deberse a problemas de conectividad.
               </motion.p>
 
               <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.3, duration: 0.3 }}>
@@ -263,7 +202,7 @@ export default function Component() {
             onClick={() => setIsFullPage(false)}
             variant="outline"
             size="icon"
-            className="absolute top-6 right-6 border-red-500 text-red-300 hover:bg-red-500/20 transition-colors duration-200"
+            className="absolute top-6 right-6 border-red-500 bg-red-900 text-red-300 hover:bg-red-500/20 transition-colors duration-200"
           >
             <Minimize2 className="h-4 w-4" />
           </Button>
@@ -347,7 +286,7 @@ export default function Component() {
             animate={{ opacity: 1 }}
             transition={{ delay: 0.15, duration: 0.3 }}
           >
-            Precio oficial del Banco Central de Venezuela
+            Precio oficial al día {bcvData.lastUpdate}
           </motion.p>
         </motion.header>
 
@@ -411,6 +350,7 @@ export default function Component() {
                       <Input
                         id="usd"
                         type="number"
+                        min="0"
                         value={usdAmount}
                         onChange={(e) => handleUsdChange(e.target.value)}
                         className="bg-black/50 border-red-500/50 text-white focus:border-red-400 transition-colors duration-200"
@@ -428,7 +368,7 @@ export default function Component() {
                           onClick={swapCurrencies}
                           variant="outline"
                           size="icon"
-                          className="border-red-500 text-red-300  bg-red-200 hover:bg-red-500/20 transition-colors duration-200"
+                          className="border-red-500 text-red-300  bg-red-900 hover:bg-red-500/20 transition-colors duration-200"
                         >
                           <ArrowUpDown className="w-4 h-4" />
                         </Button>
@@ -475,7 +415,12 @@ export default function Component() {
           transition={{ delay: 0.3, duration: 0.4 }}
           className="text-center mt-12 pb-8"
         >
-          <p className="text-red-400 text-sm">Datos obtenidos del Banco Central de Venezuela (BCV)</p>
+          <p className="text-red-400 text-sm">
+            Datos obtenidos del{" "}
+            <a href="https://www.bcv.org.ve/" className="underline" target="_blank" rel="noopener noreferrer">
+              Banco Central de Venezuela (BCV)
+            </a>
+          </p>
         </motion.footer>
       </div>
     </div>
