@@ -1,12 +1,24 @@
 import { NextResponse } from "next/server"
-import puppeteer from "puppeteer"
 
-export async function GET() {
-  let browser
-  try {
-    console.log("Iniciando scraping con Puppeteer...")
+// Configuración condicional para diferentes entornos
+async function getBrowser() {
+  if (process.env.VERCEL) {
+    // En producción (Vercel), usar puppeteer-core con Chromium remoto
+    const puppeteerCore = await import("puppeteer-core")
+    const chromium = await import("@sparticuz/chromium-min")
 
-    browser = await puppeteer.launch({
+    return await puppeteerCore.default.launch({
+      args: chromium.default.args,
+      defaultViewport: chromium.default.defaultViewport,
+      executablePath: await chromium.default.executablePath(
+        "https://github.com/Sparticuz/chromium/releases/download/v121.0.0/chromium-v121.0.0-pack.tar",
+      ),
+      headless: chromium.default.headless,
+    })
+  } else {
+    // En desarrollo local, usar puppeteer normal
+    const puppeteer = await import("puppeteer")
+    return await puppeteer.default.launch({
       headless: "new",
       args: [
         "--disable-setuid-sandbox",
@@ -18,20 +30,26 @@ export async function GET() {
       ],
       ignoreHTTPSErrors: true,
     })
+  }
+}
 
+export async function GET() {
+  let browser
+
+  try {
+    console.log("Iniciando scraping con Puppeteer...")
+
+    browser = await getBrowser()
     const page = await browser.newPage()
 
+    // Configurar user agent y viewport
     await page.setUserAgent(
       "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
     )
-
     await page.setViewport({ width: 1280, height: 800 })
 
     console.log("Navegando a BCV...")
-    await page.goto("https://www.bcv.org.ve/", {
-      waitUntil: "networkidle2",
-      timeout: 30000,
-    })
+    await page.goto("https://www.bcv.org.ve/")
 
     console.log("Extrayendo valor del dólar...")
     const valorDolar = await page.evaluate(() => {
@@ -83,7 +101,7 @@ export async function GET() {
       throw new Error("Valor del dólar inválido")
     }
 
-    // Formatear fecha sin hora
+    // Formatear fecha
     const currentDate = new Date()
     const lastUpdate = currentDate.toLocaleDateString("es-VE", {
       year: "numeric",
@@ -98,6 +116,7 @@ export async function GET() {
       lastUpdate: lastUpdate,
       source: "BCV",
       timestamp: currentDate.toISOString(),
+      success: true,
     })
   } catch (error) {
     console.error("Error en scraping BCV:", error)
@@ -106,6 +125,7 @@ export async function GET() {
       {
         error: "No se pudo obtener la información del BCV",
         details: error instanceof Error ? error.message : "Error desconocido",
+        success: false,
       },
       { status: 500 },
     )
