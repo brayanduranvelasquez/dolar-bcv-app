@@ -358,20 +358,11 @@ export default function Component() {
                       />
                     </div>
 
-                    <div className="flex justify-center">
-                      <motion.div
-                        whileHover={{ scale: 1.05 }}
-                        whileTap={{ scale: 0.95 }}
-                        transition={{ type: "tween", duration: 0.15 }}
-                      >
-                        <Button
-                          onClick={swapCurrencies}
-                          variant="outline"
-                          size="icon"
-                          className="border-red-500 text-red-300  bg-red-900 hover:bg-red-500/20 transition-colors duration-200"
-                        >
+                    <div className="flex justify-center pt-4">
+                      <motion.div transition={{ type: "tween", duration: 0.15 }}>
+                        <div className="border-red-500 text-red-300 bg-red-900 p-3 rounded-full transition-colors duration-200">
                           <ArrowUpDown className="w-4 h-4" />
-                        </Button>
+                        </div>
                       </motion.div>
                     </div>
 
