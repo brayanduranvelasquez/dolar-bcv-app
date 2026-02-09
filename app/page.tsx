@@ -286,7 +286,7 @@ export default function Component() {
             animate={{ opacity: 1 }}
             transition={{ delay: 0.15, duration: 0.3 }}
           >
-            Precio oficial al día {bcvData.lastUpdate}
+            Precio oficial al día {bcvData?.lastUpdate}
           </motion.p>
         </motion.header>
 
@@ -407,10 +407,12 @@ export default function Component() {
           className="text-center mt-12 pb-8"
         >
           <p className="text-red-400 text-sm">
-            Datos obtenidos del{" "}
+            Datos scrapeados públicamente del{" "}
             <a href="https://www.bcv.org.ve/" className="underline" target="_blank" rel="noopener noreferrer">
-              Banco Central de Venezuela (BCV)
-            </a>
+              Banco Central de Venezuela (BCV).
+            </a>{" "}
+            <br />
+            Uso educativo/no comercial. No confíe en este sitio para tomar decisiones financieras.
           </p>
         </motion.footer>
       </div>
